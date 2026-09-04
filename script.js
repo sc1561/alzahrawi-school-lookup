@@ -53,6 +53,10 @@
     t = removeTashkeel(t);
     t = unifyHamza(t);
     t = t.replace(/\s+/g, " ").trim();
+    // قبول الاسم مع كلمة «بن» أو بدونها، وتوحيد كتابة عبدالله.
+    t = t.replace(/(^|\s)بن(?=\s|$)/g, " ");
+    t = t.replace(/عبد\s+الله/g, "عبدالله");
+    t = t.replace(/\s+/g, " ").trim();
     return t;
   }
 
