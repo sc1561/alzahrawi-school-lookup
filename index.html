@@ -29,7 +29,7 @@
     <!-- ==================== العنوان الرئيسي ==================== -->
     <section class="intro">
       <h1 class="main-title">الاستعلام عن بيانات الطالب</h1>
-      <p class="sub-text">يرجى إدخال اسم الطالب الثلاثي والقبيلة</p>
+      <p class="sub-text">يرجى إدخال اسم الطالب الكامل</p>
     </section>
 
     <!-- ==================== بطاقة البحث ==================== -->
@@ -44,23 +44,7 @@
             placeholder="مثال: أحمد محمد سالم الحارثي"
             autocomplete="off"
             inputmode="text"
-          >
-        </div>
-
-        <!-- حقل إضافي اختياري لحماية بيانات الطلاب، يصبح مطلوبًا تلقائيًا عند تشابه الأسماء -->
-        <div class="field-group" id="idFieldGroup">
-          <label for="studentExtra">
-            الرقم التعريفي أو آخر 4 أرقام من الرقم المدني
-            <span class="optional-tag" id="optionalTag">(اختياري)</span>
-          </label>
-          <input
-            type="text"
-            id="studentExtra"
-            name="studentExtra"
-            placeholder="مثال: 4521"
-            autocomplete="off"
-            inputmode="numeric"
-            maxlength="10"
+            required
           >
         </div>
 
