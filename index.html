@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>مدرسة أبو القاسم الزهراوي للتعليم الأساسي - الاستعلام عن بيانات الطالب</title>
+  <meta name="description" content="نظام الاستعلام عن بيانات الطالب - مدرسة أبو القاسم الزهراوي للتعليم الأساسي (5-9)">
+
+  <!-- خطوط عربية واضحة: Cairo و Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="images/school-logo.png">
+</head>
+<body>
+
+  <!-- ==================== الرأس: الشعار واسم المدرسة ==================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <img src="images/school-logo.png" alt="شعار مدرسة أبو القاسم الزهراوي" class="school-logo">
+      <h2 class="school-name">مدرسة أبو القاسم الزهراوي للتعليم الأساسي (5–9)</h2>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+
+    <!-- ==================== العنوان الرئيسي ==================== -->
+    <section class="intro">
+      <h1 class="main-title">الاستعلام عن بيانات الطالب</h1>
+      <p class="sub-text">يرجى إدخال اسم الطالب الثلاثي والقبيلة</p>
+    </section>
+
+    <!-- ==================== بطاقة البحث ==================== -->
+    <section class="card search-card" id="searchCard">
+      <form id="searchForm" novalidate>
+        <div class="field-group">
+          <label for="studentName">اسم الطالب</label>
+          <input
+            type="text"
+            id="studentName"
+            name="studentName"
+            placeholder="مثال: أحمد محمد سالم الحارثي"
+            autocomplete="off"
+            inputmode="text"
+          >
+        </div>
+
+        <!-- حقل إضافي اختياري لحماية بيانات الطلاب، يصبح مطلوبًا تلقائيًا عند تشابه الأسماء -->
+        <div class="field-group" id="idFieldGroup">
+          <label for="studentExtra">
+            الرقم التعريفي أو آخر 4 أرقام من الرقم المدني
+            <span class="optional-tag" id="optionalTag">(اختياري)</span>
+          </label>
+          <input
+            type="text"
+            id="studentExtra"
+            name="studentExtra"
+            placeholder="مثال: 4521"
+            autocomplete="off"
+            inputmode="numeric"
+            maxlength="10"
+          >
+        </div>
+
+        <div class="message-box" id="messageBox" role="alert" aria-live="polite"></div>
+
+        <button type="submit" class="btn-search" id="searchBtn">
+          <span class="btn-text">بحث</span>
+          <span class="spinner" id="spinner" hidden></span>
+        </button>
+      </form>
+
+      <p class="privacy-note">تُستخدم البيانات لغرض الاستعلام المدرسي فقط.</p>
+    </section>
+
+    <!-- ==================== بطاقة النتيجة ==================== -->
+    <section class="card result-card" id="resultCard" hidden>
+      <h2 class="result-title">بيانات الطالب</h2>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <span class="result-label">اسم الطالب</span>
+          <span class="result-value" id="resultName">—</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">مقيد بالصف</span>
+          <span class="result-value" id="resultGrade">—</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">الشعبة</span>
+          <span class="result-value" id="resultSection">—</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn-new-search" id="newSearchBtn">بحث جديد</button>
+    </section>
+
+  </main>
+
+  <!-- ==================== الذيل ==================== -->
+  <footer class="site-footer">
+    <p>جميع الحقوق محفوظة © مدرسة أبو القاسم الزهراوي للتعليم الأساسي</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

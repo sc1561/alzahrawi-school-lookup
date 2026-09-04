@@ -1,0 +1,351 @@
+/* ============================================================
+   style.css
+   تنسيق صفحة الاستعلام - مدرسة أبو القاسم الزهراوي
+   الألوان الأساسية مستمدة من شعار المدرسة (أخضر داكن + أحمر)
+   ============================================================ */
+
+:root {
+  --school-green: #185c37;
+  --school-green-dark: #0f3f26;
+  --school-red: #e30613;
+  --school-red-dark: #b5040f;
+  --bg-light: #f6f4ee;
+  --card-bg: #fffdf8;
+  --text-main: #22301f;
+  --text-muted: #6b6b63;
+  --border-soft: #e7e2d6;
+  --shadow-soft: 0 8px 24px rgba(24, 92, 55, 0.10);
+  --shadow-hover: 0 12px 32px rgba(24, 92, 55, 0.16);
+  --radius-lg: 20px;
+  --radius-md: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  direction: rtl;
+  font-family: "Tajawal", "Cairo", "Segoe UI", Tahoma, sans-serif;
+  background: linear-gradient(180deg, #f8f6f0 0%, #f1efe6 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.6;
+}
+
+/* ==================== الرأس ==================== */
+.site-header {
+  background: linear-gradient(135deg, var(--school-green) 0%, var(--school-green-dark) 100%);
+  padding: 22px 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.school-logo {
+  height: 110px;
+  width: auto;
+  max-width: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.school-name {
+  color: #fff;
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 0;
+  padding: 0 8px;
+}
+
+/* ==================== المحتوى الرئيسي ==================== */
+.page-wrap {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px 24px;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.main-title {
+  font-family: "Cairo", sans-serif;
+  font-weight: 800;
+  font-size: 1.9rem;
+  color: var(--school-green-dark);
+  margin: 0 0 10px;
+}
+
+.sub-text {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+/* ==================== البطاقات ==================== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 26px 22px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 20px;
+}
+
+/* ==================== نموذج البحث ==================== */
+.field-group {
+  margin-bottom: 18px;
+}
+
+.field-group label {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--school-green-dark);
+  margin-bottom: 8px;
+  font-family: "Cairo", sans-serif;
+}
+
+.optional-tag {
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.field-group input {
+  width: 100%;
+  padding: 16px 16px;
+  font-size: 1.05rem;
+  font-family: "Tajawal", sans-serif;
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--text-main);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 54px;
+}
+
+.field-group input::placeholder {
+  color: #b7b2a3;
+}
+
+.field-group input:focus {
+  outline: none;
+  border-color: var(--school-green);
+  box-shadow: 0 0 0 4px rgba(24, 92, 55, 0.12);
+}
+
+.field-group input.input-error {
+  border-color: var(--school-red);
+  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.10);
+}
+
+/* رسائل النظام */
+.message-box {
+  min-height: 0;
+  font-size: 0.95rem;
+  color: var(--school-red-dark);
+  background: transparent;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.message-box.show {
+  background: #fdecec;
+  border: 1px solid #f6c6c9;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.message-box.info.show {
+  background: #eef6f0;
+  border-color: #c9e3cf;
+  color: var(--school-green-dark);
+}
+
+/* زر البحث */
+.btn-search {
+  width: 100%;
+  min-height: 56px;
+  background: linear-gradient(135deg, var(--school-red) 0%, var(--school-red-dark) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 18px rgba(227, 6, 19, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(227, 6, 19, 0.34);
+}
+
+.btn-search:active {
+  transform: translateY(0);
+}
+
+.btn-search:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.privacy-note {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 16px 0 0;
+}
+
+/* ==================== بطاقة النتيجة ==================== */
+.result-card {
+  border-color: #cfe4d6;
+  animation: fadeSlideIn 0.5s ease;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-title {
+  font-family: "Cairo", sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--school-green-dark);
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.result-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f6faf6;
+  border: 1px solid #e2ede3;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.result-label {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.result-value {
+  color: var(--school-green-dark);
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+.btn-new-search {
+  width: 100%;
+  min-height: 52px;
+  background: #fff;
+  color: var(--school-green-dark);
+  border: 2px solid var(--school-green);
+  border-radius: var(--radius-md);
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-new-search:hover {
+  background: #eef6f0;
+  transform: translateY(-1px);
+}
+
+/* ==================== الذيل ==================== */
+.site-footer {
+  text-align: center;
+  padding: 20px 16px 28px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ==================== استجابة الشاشات ==================== */
+@media (min-width: 640px) {
+  .school-name {
+    font-size: 1.4rem;
+  }
+  .main-title {
+    font-size: 2.1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .school-logo {
+    height: 90px;
+  }
+  .card {
+    padding: 20px 16px;
+  }
+  .main-title {
+    font-size: 1.6rem;
+  }
+}
