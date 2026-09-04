@@ -11,8 +11,6 @@
   /* ------------------ عناصر الصفحة ------------------ */
   const form           = document.getElementById("searchForm");
   const nameInput      = document.getElementById("studentName");
-  const extraInput     = document.getElementById("studentExtra");
-  const optionalTag    = document.getElementById("optionalTag");
   const messageBox     = document.getElementById("messageBox");
   const searchBtn      = document.getElementById("searchBtn");
   const spinner        = document.getElementById("spinner");
@@ -28,7 +26,6 @@
   const LOCK_SECONDS = 30;     // مدة القفل المؤقت بعد تجاوز الحد
   let failedAttempts = 0;
   let isLocked = false;
-  let pendingMultipleMatches = null; // نتائج متعددة بانتظار رقم تعريفي إضافي
 
   /* ============================================================
      أدوات تطبيع النص العربي (لأغراض المطابقة فقط، لا تُعرض للمستخدم)
@@ -59,35 +56,23 @@
     return t;
   }
 
-  function normalizeWords(text) {
-    const n = normalizeText(text);
-    return n.length ? n.split(" ") : [];
-  }
-
   /* ============================================================
      منطق البحث
      ============================================================ */
 
-  // يبحث عن كل الطلاب الذين تتطابق بداية اسمهم (بنفس الترتيب) مع الكلمات المدخلة
-  function findMatches(inputName) {
-    const inputWords = normalizeWords(inputName);
-    if (inputWords.length === 0) return [];
-
-    return studentsData.filter((student) => {
-      const nameWords = normalizeWords(student.name);
-      if (nameWords.length < inputWords.length) return false;
-      for (let i = 0; i < inputWords.length; i++) {
-        if (nameWords[i] !== inputWords[i]) return false;
-      }
-      return true;
-    });
+  // إنشاء بصمة مشفرة من الاسم الكامل دون كشفه في ملف البيانات
+  async function createLookupKey(inputName) {
+    const value = normalizeText(inputName);
+    const bytes = new TextEncoder().encode(value);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
   }
 
-  // يضيّق نتائج متعددة باستخدام الرقم التعريفي أو آخر أربعة أرقام من الرقم المدني
-  function narrowByExtra(matches, extraValue) {
-    const v = normalizeText(extraValue).replace(/\s/g, "");
-    if (!v) return matches;
-    return matches.filter((s) => s.id === v || s.last4 === v);
+  async function findStudent(inputName) {
+    const key = await createLookupKey(inputName);
+    return studentsData.find((student) => student.key === key) || null;
   }
 
   /* ============================================================
@@ -113,22 +98,12 @@
     spinner.hidden = !isLoading;
   }
 
-  function requireExtraField(required) {
-    if (required) {
-      optionalTag.textContent = "(مطلوب)";
-      extraInput.setAttribute("required", "required");
-    } else {
-      optionalTag.textContent = "(اختياري)";
-      extraInput.removeAttribute("required");
-    }
-  }
-
   /* ============================================================
      عرض النتيجة
      ============================================================ */
 
-  function showResult(student) {
-    resultName.textContent = student.name;
+  function showResult(student, enteredName) {
+    resultName.textContent = enteredName.trim().replace(/\s+/g, " ");
     resultGrade.textContent = student.grade;
     resultSection.textContent = student.section;
 
@@ -145,9 +120,6 @@
     form.reset();
     clearMessage();
     markFieldError(nameInput, false);
-    markFieldError(extraInput, false);
-    requireExtraField(false);
-    pendingMultipleMatches = null;
 
     resultCard.hidden = true;
     searchCard.hidden = false;
@@ -196,10 +168,8 @@
   function performSearch() {
     clearMessage();
     markFieldError(nameInput, false);
-    markFieldError(extraInput, false);
 
     const nameValue = nameInput.value;
-    const extraValue = extraInput.value;
 
     // التحقق من الحقل الفارغ
     if (!nameValue || !nameValue.trim()) {
@@ -216,19 +186,14 @@
     setLoading(true);
 
     // مؤشر تحميل قصير لتحسين تجربة الانتظار (البحث محلي وفوري)
-    window.setTimeout(() => {
+    window.setTimeout(async () => {
       try {
-        let matches = findMatches(nameValue);
+        const student = await findStudent(nameValue);
 
-        // تضييق النتائج إذا زوّد المستخدم بالرقم التعريفي أو آخر 4 أرقام
-        if (matches.length > 1 && extraValue.trim()) {
-          matches = narrowByExtra(matches, extraValue);
-        }
-
-        if (matches.length === 0) {
+        if (!student) {
           failedAttempts += 1;
           showMessage(
-            "عذرًا، لم يتم العثور على طالب مطابق للبيانات المدخلة. يرجى التأكد من كتابة الاسم بصورة صحيحة.",
+            "عذرًا، لم يتم العثور على طالب مطابق. يرجى التأكد من كتابة الاسم الكامل كما ورد في السجل المدرسي.",
             ""
           );
           markFieldError(nameInput, true);
@@ -236,22 +201,10 @@
           if (failedAttempts >= MAX_ATTEMPTS) {
             lockSearchTemporarily();
           }
-        } else if (matches.length > 1) {
-          // أكثر من طالب بنفس الاسم: نطلب رقمًا تعريفيًا إضافيًا
-          pendingMultipleMatches = matches;
-          requireExtraField(true);
-          showMessage(
-            "يوجد أكثر من طالب بالاسم نفسه، يرجى إدخال الرقم التعريفي للطالب.",
-            ""
-          );
-          markFieldError(extraInput, true);
-          extraInput.focus();
         } else {
-          // نتيجة واحدة مؤكدة
           failedAttempts = 0;
-          pendingMultipleMatches = null;
           clearMessage();
-          showResult(matches[0]);
+          showResult(student, nameValue);
         }
       } catch (err) {
         showMessage("تعذر تنفيذ البحث حاليًا، يرجى المحاولة مرة أخرى.", "");
@@ -274,6 +227,4 @@
 
   // إزالة حالة الخطأ عند بدء الكتابة من جديد
   nameInput.addEventListener("input", () => markFieldError(nameInput, false));
-  extraInput.addEventListener("input", () => markFieldError(extraInput, false));
-
 })();
