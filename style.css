@@ -163,6 +163,66 @@ body {
   box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.10);
 }
 
+.voice-input-wrap {
+  position: relative;
+}
+
+.voice-input-wrap input {
+  padding-left: 64px;
+}
+
+.btn-voice {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: var(--school-green);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-voice:hover {
+  background: var(--school-green-dark);
+}
+
+.btn-voice:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.btn-voice.listening {
+  background: var(--school-red);
+  animation: voice-pulse 1.1s infinite;
+}
+
+.btn-voice:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-voice svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+}
+
+.voice-hint {
+  display: block;
+  margin-top: 7px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@keyframes voice-pulse {
+  50% { box-shadow: 0 0 0 7px rgba(227, 6, 19, 0.16); }
+}
+
 /* رسائل النظام */
 .message-box {
   min-height: 0;
