@@ -20,10 +20,12 @@
   const resultGrade    = document.getElementById("resultGrade");
   const resultSection  = document.getElementById("resultSection");
   const newSearchBtn   = document.getElementById("newSearchBtn");
+  const voiceBtn       = document.getElementById("voiceBtn");
+  const voiceHint      = document.getElementById("voiceHint");
 
   /* ------------------ إعدادات الحماية ------------------ */
-  const MAX_ATTEMPTS = 6;      // الحد الأقصى للمحاولات المتتالية غير الناجحة
-  const LOCK_SECONDS = 30;     // مدة القفل المؤقت بعد تجاوز الحد
+  const MAX_ATTEMPTS = 20;     // عدد مريح من المحاولات المتتالية غير الناجحة
+  const LOCK_SECONDS = 10;     // قفل قصير بعد تجاوز الحد
   let failedAttempts = 0;
   let isLocked = false;
 
@@ -52,10 +54,12 @@
     let t = text.trim();
     t = removeTashkeel(t);
     t = unifyHamza(t);
+    t = t.replace(/[،؛؟,.!ـ-]/g, " ");
     t = t.replace(/\s+/g, " ").trim();
     // قبول الاسم مع كلمة «بن» أو بدونها، وتوحيد كتابة عبدالله.
     t = t.replace(/(^|\s)بن(?=\s|$)/g, " ");
     t = t.replace(/عبد\s+الله/g, "عبدالله");
+    t = t.replace(/ظ/g, "ض");
     t = t.replace(/\s+/g, " ").trim();
     return t;
   }
@@ -74,9 +78,9 @@
       .join("");
   }
 
-  async function findStudent(inputName) {
+  async function findMatches(inputName) {
     const key = await createLookupKey(inputName);
-    return studentsData.find((student) => student.key === key) || null;
+    return studentsData.filter((student) => student.keys.includes(key));
   }
 
   /* ============================================================
@@ -192,9 +196,9 @@
     // مؤشر تحميل قصير لتحسين تجربة الانتظار (البحث محلي وفوري)
     window.setTimeout(async () => {
       try {
-        const student = await findStudent(nameValue);
+        const matches = await findMatches(nameValue);
 
-        if (!student) {
+        if (matches.length === 0) {
           failedAttempts += 1;
           showMessage(
             "عذرًا، لم يتم العثور على طالب مطابق. يرجى التأكد من كتابة الاسم الكامل كما ورد في السجل المدرسي.",
@@ -205,10 +209,16 @@
           if (failedAttempts >= MAX_ATTEMPTS) {
             lockSearchTemporarily();
           }
+        } else if (matches.length > 1) {
+          showMessage(
+            "يوجد أكثر من طالب يتطابق مع هذا الاسم. يرجى إضافة جزء آخر من الاسم لتمييز الطالب المطلوب.",
+            "info"
+          );
+          nameInput.focus();
         } else {
           failedAttempts = 0;
           clearMessage();
-          showResult(student, nameValue);
+          showResult(matches[0], nameValue);
         }
       } catch (err) {
         showMessage("تعذر تنفيذ البحث حاليًا، يرجى المحاولة مرة أخرى.", "");
@@ -231,4 +241,58 @@
 
   // إزالة حالة الخطأ عند بدء الكتابة من جديد
   nameInput.addEventListener("input", () => markFieldError(nameInput, false));
+
+  /* ============================================================
+     الكتابة بالصوت - تعمل في المتصفحات الداعمة مثل Chrome
+     ============================================================ */
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    voiceBtn.disabled = true;
+    voiceHint.textContent = "الكتابة بالصوت غير مدعومة في هذا المتصفح؛ يمكنك كتابة الاسم يدويًا.";
+  } else {
+    const recognition = new SpeechRecognition();
+    recognition.lang = "ar-OM";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    voiceBtn.addEventListener("click", () => {
+      clearMessage();
+      try {
+        recognition.start();
+      } catch (error) {
+        showMessage("الميكروفون يعمل بالفعل، يرجى نطق الاسم بوضوح.", "info");
+      }
+    });
+
+    recognition.onstart = () => {
+      voiceBtn.classList.add("listening");
+      voiceHint.textContent = "جارٍ الاستماع... انطق اسم الطالب الثلاثي بوضوح.";
+    };
+
+    recognition.onresult = (event) => {
+      const spokenName = event.results[0][0].transcript.trim();
+      nameInput.value = spokenName;
+      markFieldError(nameInput, false);
+      voiceHint.textContent = "تمت كتابة الاسم. راجعه ثم اضغط على «بحث».";
+      nameInput.focus();
+    };
+
+    recognition.onerror = (event) => {
+      const denied = event.error === "not-allowed" || event.error === "service-not-allowed";
+      showMessage(
+        denied
+          ? "يرجى السماح للموقع باستخدام الميكروفون لتفعيل البحث الصوتي."
+          : "لم أتمكن من سماع الاسم بوضوح، يرجى المحاولة مرة أخرى.",
+        ""
+      );
+    };
+
+    recognition.onend = () => {
+      voiceBtn.classList.remove("listening");
+      if (!nameInput.value.trim()) {
+        voiceHint.textContent = "يمكنك كتابة الاسم أو الضغط على الميكروفون ونطقه.";
+      }
+    };
+  }
 })();
